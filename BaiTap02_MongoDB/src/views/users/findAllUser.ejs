@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Users</title></head>
+<body>
+  <h1>User List</h1>
+  <table border="1" cellpadding="6">
+    <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Action</th></tr></thead>
+    <tbody>
+      <% (data || []).forEach((u, i) => { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= u.firstName %> <%= u.lastName %></td>
+          <td><%= u.email %></td>
+          <td>
+            <a href="/edit-crud?id=<%= u._id %>">Edit</a> |
+            <a href="/delete-crud?id=<%= u._id %>" onclick="return confirm('Delete?')">Delete</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <p><a href="/">Back to create</a></p>
+</body>
+</html>
