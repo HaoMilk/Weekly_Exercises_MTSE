@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Update User</title></head>
+<body>
+  <h1>Update User #<%= user.id %></h1>
+  <form method="POST" action="/users/<%= user.id %>">
+    <input name="firstName" value="<%= user.firstName %>" required />
+    <input name="lastName" value="<%= user.lastName %>" required />
+    <input name="email" type="email" value="<%= user.email %>" required />
+    <input name="address" value="<%= user.address || '' %>" />
+    <button type="submit">Save</button>
+  </form>
+  <p><a href="/users">Back</a></p>
+</body>
+</html>
