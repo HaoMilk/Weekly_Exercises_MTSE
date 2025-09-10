@@ -1,0 +1,28 @@
+{
+  "name": "cart-library-ute",
+  "version": "0.0.8",
+  "description": "React cart library with UI components",
+  "type": "module",
+  "main": "./dist/cart-library.umd.js",
+  "module": "./dist/cart-library.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/cart-library.es.js",
+      "require": "./dist/cart-library.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build"
+  },
+  "peerDependencies": {
+    "react": ">=17",
+    "react-dom": ">=17"
+  },
+  "devDependencies": {
+    "vite": "^4.5.3",
+    "@vitejs/plugin-react": "^4.2.0"
+  }
+}
