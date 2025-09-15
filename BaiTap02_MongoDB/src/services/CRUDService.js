@@ -1,24 +1,33 @@
-import User from "../models/User.js";
+// src/services/CRUDService.js
+import User from '../models/user.model.js';
+
 
 export async function createNewUser(data) {
-  const doc = await User.create(data);
-  return doc.toObject();
+const user = await User.create(data);
+return user.toObject();
 }
+
 
 export async function getAllUsers() {
-  return await User.find({}).lean();
+const users = await User.find().sort({ createdAt: -1 }).lean();
+return users;
 }
+
 
 export async function getUserById(id) {
-  return await User.findById(id).lean();
+const user = await User.findById(id).lean();
+return user;
 }
 
-export async function updateUserData(id, data) {
-  await User.findByIdAndUpdate(id, data, { runValidators: true });
-  return await getUserById(id);
+
+export async function updateUser(data) {
+const { id, ...rest } = data;
+const updated = await User.findByIdAndUpdate(id, rest, { new: true }).lean();
+return updated;
 }
+
 
 export async function deleteUserById(id) {
-  await User.findByIdAndDelete(id);
-  return true;
+await User.findByIdAndDelete(id);
+return true;
 }

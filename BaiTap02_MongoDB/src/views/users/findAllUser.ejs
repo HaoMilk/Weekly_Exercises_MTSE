@@ -1,25 +1,51 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Users</title></head>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Danh sách User</title>
+<style>body{font-family: system-ui, sans-serif; margin: 24px;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;text-align:left} a.btn,button{padding:6px 10px;display:inline-block;margin:0 6px 0 0}</style>
+</head>
 <body>
-  <h1>User List</h1>
-  <table border="1" cellpadding="6">
-    <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Action</th></tr></thead>
-    <tbody>
-      <% (data || []).forEach((u, i) => { %>
-        <tr>
-          <td><%= i + 1 %></td>
-          <td><%= u.firstName %> <%= u.lastName %></td>
-          <td><%= u.email %></td>
-          <td>
-            <a href="/edit-crud?id=<%= u._id %>">Edit</a> |
-            <a href="/delete-crud?id=<%= u._id %>" onclick="return confirm('Delete?')">Delete</a>
-          </td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
+<h2>Danh sách User</h2>
+<p><a class="btn" href="/">+ Thêm mới</a></p>
 
-  <p><a href="/">Back to create</a></p>
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Họ tên</th>
+<th>Email</th>
+<th>Địa chỉ</th>
+<th>Điện thoại</th>
+<th>Giới tính</th>
+<th>Hành động</th>
+</tr>
+</thead>
+<tbody>
+<% if (users && users.length) { %>
+<% users.forEach((u, idx) => { %>
+<tr>
+<td><%= idx + 1 %></td>
+<td><%= u.firstName %> <%= u.lastName %></td>
+<td><%= u.email %></td>
+<td><%= u.address || '' %></td>
+<td><%= u.phoneNumber || '' %></td>
+<td><%= u.gender %></td>
+<td>
+<a class="btn" href="/edit-crud?id=<%= u._id %>">Sửa</a>
+<form action="/delete-crud" method="POST" style="display:inline">
+<input type="hidden" name="id" value="<%= u._id %>" />
+<button type="submit" onclick="return confirm('Xóa user này?')">Xóa</button>
+</form>
+</td>
+</tr>
+<% }) %>
+<% } else { %>
+<tr><td colspan="7">Chưa có dữ liệu</td></tr>
+<% } %>
+</tbody>
+</table>
 </body>
 </html>

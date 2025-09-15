@@ -1,29 +1,26 @@
-import "dotenv/config";
-import express from "express";
-import bodyParser from "body-parser";
-import path from "path";
-import { fileURLToPath } from "url";
-import { connectDB } from "./config/configdb.js";
-import webRoutes from "./routes/web.js";
+// src/server.js
+import express from 'express';
+import dotenv from 'dotenv';
+import configViewEngine from './config/viewEngine.js';
+import webRoutes from './routes/web.js';
+import { connectDB } from './config/db.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
+dotenv.config();
+
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+configViewEngine(app);
+app.use('/', webRoutes);
+
+
 const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
-// View engine
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-// Static (nếu cần)
-// app.use(express.static(path.join(__dirname, "public")));
-
-app.use("/", webRoutes);
-
-connectDB(process.env.MONGODB_URI)
-  .then(() => app.listen(PORT, () => console.log(`🚀 http://localhost:${PORT}`)))
-  .catch((e) => console.error("Mongo connect error:", e));
+connectDB(process.env.MONGODB_URI).then(() => {
+app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+});

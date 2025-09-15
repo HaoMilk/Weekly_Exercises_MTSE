@@ -1,49 +1,67 @@
+// src/controllers/homeController.js
 import {
-  createNewUser,
-  getAllUsers,
-  getUserById,
-  updateUserData,
-  deleteUserById
-} from "../services/CRUDService.js";
+    createNewUser,
+    getAllUsers,
+    getUserById,
+    updateUser,
+    deleteUserById,
+    } from '../services/CRUDService.js';
+    
+    
+    export async function getCRUD(req, res) {
+    return res.render('crud.ejs');
+    }
 
-export const getHomePage = async (req, res) => {
-  res.render("crud"); // form thêm user
-};
+    export async function getAboutPage(req, res) {
+    return res.send('About page');
+    }
 
-export const postCRUD = async (req, res) => {
-  try {
+    export async function getHomePage(req, res) {
+    return res.render('crud.ejs');
+    }
+    
+    
+    export async function postCRUD(req, res) {
+    try {
     await createNewUser(req.body);
-    res.redirect("/users");
-  } catch (e) {
-    res.status(400).send(e.message);
-  }
-};
-
-export const displayGetCRUD = async (req, res) => {
-  const data = await getAllUsers();
-  res.render("users/findAllUser", { data });
-};
-
-export const getEditCRUD = async (req, res) => {
-  const user = await getUserById(req.query.id);
-  if (!user) return res.status(404).send("User not found");
-  res.render("users/updateUser", { user });
-};
-
-export const putCRUD = async (req, res) => {
-  try {
-    await updateUserData(req.body.id, req.body);
-    res.redirect("/users");
-  } catch (e) {
-    res.status(400).send(e.message);
-  }
-};
-
-export const deleteCRUD = async (req, res) => {
-  try {
-    await deleteUserById(req.query.id);
-    res.redirect("/users");
-  } catch (e) {
-    res.status(400).send(e.message);
-  }
-};
+    return res.redirect('/get-crud');
+    } catch (e) {
+    return res.status(400).send(e.message || 'Create failed');
+    }
+    }
+    
+    
+    export async function displayGetCRUD(req, res) {
+    const users = await getAllUsers();
+    return res.render('users/findAllUser.ejs', { users });
+    }
+    
+    
+    export async function getEditCRUD(req, res) {
+    const id = req.query.id;
+    if (!id) return res.redirect('/get-crud');
+    const user = await getUserById(id);
+    if (!user) return res.redirect('/get-crud');
+    return res.render('users/updateUser.ejs', { user });
+    }
+    
+    
+    export async function putCRUD(req, res) {
+    try {
+    await updateUser(req.body);
+    return res.redirect('/get-crud');
+    } catch (e) {
+    return res.status(400).send(e.message || 'Update failed');
+    }
+    }
+    
+    
+    export async function deleteCRUD(req, res) {
+    try {
+    const { id } = req.body;
+    if (id) await deleteUserById(id);
+    return res.redirect('/get-crud');
+    } catch (e) {
+    return res.status(400).send(e.message || 'Delete failed');
+    }
+    }
