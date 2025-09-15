@@ -44,6 +44,9 @@ export default function Layout({ children }) {
             <Menu.Item key="/home">
               <Link to="/home">Trang chủ</Link>
             </Menu.Item>
+            <Menu.Item key="/products">
+              <Link to="/products">Sản phẩm</Link>
+            </Menu.Item>
             {!user && (
               <>
                 <Menu.Item key="/login">
