@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cập nhật User</title>
+<style>body{font-family: system-ui, sans-serif; margin: 24px;} label{display:block;margin-top:10px;} input,select{padding:8px;width:320px}</style>
+</head>
+<body>
+<h2>Cập nhật User</h2>
+<form action="/put-crud" method="POST">
+<input type="hidden" name="id" value="<%= user._id %>" />
+
+
+<label>First name
+<input name="firstName" value="<%= user.firstName %>" required />
+</label>
+<label>Last name
+<input name="lastName" value="<%= user.lastName %>" required />
+</label>
+<label>Email
+<input type="email" name="email" value="<%= user.email %>" required />
+</label>
+<label>Address
+<input name="address" value="<%= user.address || '' %>" />
+</label>
+<label>Phone
+<input name="phoneNumber" value="<%= user.phoneNumber || '' %>" />
+</label>
+<label>Gender
+<select name="gender" value="<%= user.gender %>">
+<option value="male" <%= user.gender==='male' ? 'selected' : '' %>>Nam</option>
+<option value="female" <%= user.gender==='female' ? 'selected' : '' %>>Nữ</option>
+<option value="other" <%= user.gender==='other' ? 'selected' : '' %>>Khác</option>
+</select>
+</label>
+
+
+<p>
+<button type="submit">Cập nhật</button>
+<a href="/get-crud">Về danh sách</a>
+</p>
+</form>
+</body>
+</html>
