@@ -1,0 +1,73 @@
+.layoutRoot {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f9f9fb;
+  }
+  
+  .layoutHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #6c63ff, #4a47e0) !important;
+    padding: 0 24px;
+    box-shadow: 0 2px 12px rgba(108, 99, 255, 0.3);
+  }
+  
+  .layoutMenu :global(.ant-menu) {
+    background: transparent;
+    border-bottom: none;
+    flex: 1;
+  }
+  
+  .layoutMenu :global(.ant-menu-item) {
+    font-weight: 500;
+    color: #fff !important;
+  }
+  
+  .layoutMenu :global(.ant-menu-item:hover) {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 6px;
+  }
+  
+  .layoutAuth {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .layoutAuth a {
+    color: #ffffff;
+    font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .layoutAuth a:hover {
+    opacity: 0.8;
+  }
+  
+  /* Nút Đăng xuất */
+  .logoutButton :global(.ant-btn) {
+    background: linear-gradient(90deg, #ff6b81, #ff4f66);
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0 16px;
+    height: 38px;
+    box-shadow: 0 4px 12px rgba(255, 107, 129, 0.25);
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .logoutButton :global(.ant-btn:hover) {
+    background: linear-gradient(90deg, #ff7b8e, #ff5f75);
+    transform: scale(1.03);
+    box-shadow: 0 6px 16px rgba(255, 107, 129, 0.35);
+  }
+  
+  
+  .layoutContent {
+    flex: 1;
+    padding: 32px;
+  }
