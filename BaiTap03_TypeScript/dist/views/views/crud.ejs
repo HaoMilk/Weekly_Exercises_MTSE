@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CRUD - Tạo User</title>
+<style>body{font-family: system-ui, sans-serif; margin: 24px;} label{display:block;margin-top:10px;} input,select{padding:8px;width:320px} table{border-collapse:collapse;margin-top:24px} td,th{border:1px solid #ddd;padding:8px}</style>
+</head>
+<body>
+<h2>Tạo mới User</h2>
+<form action="/post-crud" method="POST">
+<label>First name
+<input name="firstName" required />
+</label>
+<label>Last name
+<input name="lastName" required />
+</label>
+<label>Email
+<input type="email" name="email" required />
+</label>
+<label>Address
+<input name="address" />
+</label>
+<label>Phone
+<input name="phoneNumber" />
+</label>
+<label>Password
+<input type="password" name="password" required />
+</label>
+<label>Gender
+<select name="gender">
+<option value="male">Nam</option>
+<option value="female">Nữ</option>
+<option value="other" selected>Khác</option>
+</select>
+</label>
+<p>
+<button type="submit">Lưu</button>
+<a href="/get-crud">Xem danh sách</a>
+</p>
+</form>
+</body>
+</html>
