@@ -8,6 +8,8 @@ import {
   getCategories,
   getPopularTags,
   getSearchSuggestions, // service function
+  cleanDuplicateImages,
+  validatePaginationConsistency,
 } from "../services/product.service.js";
 
 // 🟢 Lấy danh sách sản phẩm (hỗ trợ filter, sort, search)
@@ -96,6 +98,35 @@ export async function getProductSearchSuggestions(req, res) {
 
     const suggestions = await getSearchSuggestions(keyword, limit);
     res.json(suggestions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+// 🟢 Làm sạch hình ảnh trùng lặp
+export async function cleanDuplicateImagesController(req, res) {
+  try {
+    const result = await cleanDuplicateImages();
+    res.json({
+      message: "Đã hoàn thành việc làm sạch hình ảnh trùng lặp",
+      ...result
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+// 🟢 Kiểm tra tính nhất quán của phân trang
+export async function validatePaginationController(req, res) {
+  try {
+    const pageSize = parseInt(req.query.pageSize) || 10;
+    const maxPages = parseInt(req.query.maxPages) || 5;
+    
+    const result = await validatePaginationConsistency(pageSize, maxPages);
+    res.json({
+      message: "Đã hoàn thành việc kiểm tra phân trang",
+      ...result
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -7,6 +7,7 @@ export default function ProductsPage() {
   const [categories, setCategories] = useState([]);
   const [popularTags, setPopularTags] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  const [imageCache, setImageCache] = useState(new Set()); // Cache để tránh hình ảnh trùng lặp
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -86,7 +87,33 @@ export default function ProductsPage() {
       });
 
       const response = await axios.get(`/products?${params.toString()}`);
-      setProducts(response.data.products);
+      
+      // Lọc hình ảnh trùng lặp và cập nhật cache
+      const processedProducts = response.data.products.map(product => {
+        if (product.images && product.images.length > 0) {
+          // Lọc hình ảnh trùng lặp trong cùng sản phẩm
+          const uniqueImages = product.images.filter((image, index, arr) => 
+            arr.findIndex(img => img.url === image.url) === index
+          );
+          
+          // Kiểm tra hình ảnh đã xuất hiện trong cache
+          const filteredImages = uniqueImages.filter(image => {
+            if (imageCache.has(image.url)) {
+              return false; // Bỏ qua hình ảnh đã xuất hiện
+            }
+            imageCache.add(image.url); // Thêm vào cache
+            return true;
+          });
+          
+          return {
+            ...product,
+            images: filteredImages.length > 0 ? filteredImages : uniqueImages.slice(0, 1)
+          };
+        }
+        return product;
+      });
+      
+      setProducts(processedProducts);
       setPagination(response.data.pagination);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -134,6 +161,11 @@ export default function ProductsPage() {
   };
 
   const handlePageChange = (page) => {
+    // Reset image cache khi chuyển trang để đảm bảo không có hình ảnh trùng lặp
+    if (page !== filters.page) {
+      setImageCache(new Set());
+    }
+    
     setFilters(prev => ({
       ...prev,
       page,
@@ -451,10 +483,27 @@ export default function ProductsPage() {
             <div key={product._id} className={styles.productCard}>
               <div className={styles.productImage}>
                 {product.images && product.images.length > 0 ? (
-                  <img src={product.images[0].url} alt={product.images[0].alt || product.name} />
+                  (() => {
+                    // Tìm hình ảnh chính hoặc lấy hình ảnh đầu tiên
+                    const primaryImage = product.images.find(img => img.isPrimary) || product.images[0];
+                    return (
+                      <img 
+                        src={primaryImage.url} 
+                        alt={primaryImage.alt || product.name}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    );
+                  })()
                 ) : (
                   <div className={styles.noImage}>Không có hình ảnh</div>
                 )}
+                {/* Fallback image nếu hình ảnh chính lỗi */}
+                <div className={styles.noImage} style={{ display: 'none' }}>
+                  Không có hình ảnh
+                </div>
               </div>
               <div className={styles.productInfo}>
                 <h3 className={styles.productName}>{product.name}</h3>

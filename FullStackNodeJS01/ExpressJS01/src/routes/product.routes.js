@@ -9,6 +9,8 @@ import {
   getProductCategories,
   getProductTags,
   getProductSearchSuggestions, // ✅ dùng hàm đã đổi tên
+  cleanDuplicateImagesController,
+  validatePaginationController,
 } from "../controllers/product.controller.js";
 
 const router = Router();
@@ -17,6 +19,8 @@ const router = Router();
 router.get("/categories/list", getProductCategories);
 router.get("/tags/popular", getProductTags);
 router.get("/suggestions", getProductSearchSuggestions); // gợi ý tìm kiếm
+router.post("/clean-duplicates", cleanDuplicateImagesController); // làm sạch hình ảnh trùng lặp
+router.get("/validate-pagination", validatePaginationController); // kiểm tra phân trang
 
 // 🟢 Route CRUD sản phẩm
 router.get("/", listProducts); // hỗ trợ tìm kiếm & lọc

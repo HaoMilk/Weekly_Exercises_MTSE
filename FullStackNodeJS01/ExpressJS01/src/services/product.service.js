@@ -97,6 +97,7 @@ export async function findProducts(queryParams) {
 
   let query = Product.find(filter)
     .populate("category")
+    .select('-__v') // Loại bỏ trường __v không cần thiết
     .skip(skip)
     .limit(limitNumber);
 
@@ -221,4 +222,151 @@ export async function getSearchSuggestions(keyword, limit = 10) {
   ]);
   
   return suggestions;
+}
+
+// Hàm kiểm tra và làm sạch hình ảnh trùng lặp
+export async function cleanDuplicateImages() {
+  try {
+    console.log("🔍 Bắt đầu kiểm tra hình ảnh trùng lặp...");
+    
+    // Lấy tất cả sản phẩm có hình ảnh
+    const products = await Product.find({ 
+      isActive: true,
+      images: { $exists: true, $ne: [] }
+    }).select('name images');
+
+    const imageMap = new Map();
+    const duplicateProducts = [];
+    let cleanedCount = 0;
+
+    // Tìm hình ảnh trùng lặp
+    for (const product of products) {
+      const uniqueImages = [];
+      const seenUrls = new Set();
+      
+      for (const image of product.images) {
+        if (image.url && !seenUrls.has(image.url)) {
+          seenUrls.add(image.url);
+          
+          if (imageMap.has(image.url)) {
+            // Hình ảnh đã tồn tại ở sản phẩm khác
+            const existingProduct = imageMap.get(image.url);
+            duplicateProducts.push({
+              product: product.name,
+              existingProduct: existingProduct,
+              imageUrl: image.url
+            });
+            
+            // Không thêm hình ảnh trùng lặp vào uniqueImages
+            console.log(`⚠️  Bỏ qua hình ảnh trùng lặp: ${image.url} (${product.name})`);
+          } else {
+            // Hình ảnh duy nhất
+            imageMap.set(image.url, product.name);
+            uniqueImages.push(image);
+          }
+        }
+      }
+      
+      // Cập nhật sản phẩm nếu có thay đổi
+      if (uniqueImages.length !== product.images.length) {
+        await Product.findByIdAndUpdate(product._id, { images: uniqueImages });
+        cleanedCount++;
+        console.log(`✅ Đã làm sạch sản phẩm: ${product.name}`);
+      }
+    }
+
+    console.log(`\n📊 Kết quả làm sạch:`);
+    console.log(`- Số sản phẩm được làm sạch: ${cleanedCount}`);
+    console.log(`- Số hình ảnh trùng lặp được loại bỏ: ${duplicateProducts.length}`);
+    
+    if (duplicateProducts.length > 0) {
+      console.log(`\n📋 Chi tiết hình ảnh trùng lặp:`);
+      duplicateProducts.forEach((dup, index) => {
+        console.log(`${index + 1}. ${dup.imageUrl}`);
+        console.log(`   Sản phẩm hiện tại: ${dup.product}`);
+        console.log(`   Sản phẩm gốc: ${dup.existingProduct}`);
+        console.log('');
+      });
+    }
+
+    return {
+      cleanedProducts: cleanedCount,
+      duplicateImages: duplicateProducts.length,
+      details: duplicateProducts
+    };
+    
+  } catch (error) {
+    console.error("❌ Lỗi khi làm sạch hình ảnh trùng lặp:", error);
+    throw error;
+  }
+}
+
+// Hàm kiểm tra tính nhất quán của phân trang
+export async function validatePaginationConsistency(pageSize = 10, maxPages = 5) {
+  try {
+    console.log("🔍 Kiểm tra tính nhất quán của phân trang...");
+    
+    const totalProducts = await Product.countDocuments({ isActive: true });
+    const totalPages = Math.ceil(totalProducts / pageSize);
+    
+    console.log(`📊 Tổng số sản phẩm: ${totalProducts}`);
+    console.log(`📄 Tổng số trang: ${totalPages}`);
+    
+    const allProductIds = new Set();
+    const allImageUrls = new Set();
+    let duplicateImagesInPagination = 0;
+    
+    for (let page = 1; page <= Math.min(maxPages, totalPages); page++) {
+      const skip = (page - 1) * pageSize;
+      const products = await Product.find({ isActive: true })
+        .skip(skip)
+        .limit(pageSize)
+        .select('_id images');
+      
+      console.log(`\n📄 Trang ${page}:`);
+      console.log(`- Số sản phẩm: ${products.length}`);
+      
+      const pageImageUrls = new Set();
+      products.forEach(product => {
+        // Kiểm tra sản phẩm trùng lặp
+        if (allProductIds.has(product._id.toString())) {
+          console.log(`⚠️  Sản phẩm trùng lặp: ${product._id}`);
+        } else {
+          allProductIds.add(product._id.toString());
+        }
+        
+        // Kiểm tra hình ảnh trùng lặp
+        product.images.forEach(image => {
+          if (image.url) {
+            if (allImageUrls.has(image.url)) {
+              duplicateImagesInPagination++;
+              console.log(`⚠️  Hình ảnh trùng lặp: ${image.url}`);
+            } else {
+              allImageUrls.add(image.url);
+            }
+            pageImageUrls.add(image.url);
+          }
+        });
+      });
+      
+      console.log(`- Số hình ảnh duy nhất trong trang: ${pageImageUrls.size}`);
+    }
+    
+    console.log(`\n📈 Kết quả kiểm tra:`);
+    console.log(`- Tổng số sản phẩm duy nhất: ${allProductIds.size}`);
+    console.log(`- Tổng số hình ảnh duy nhất: ${allImageUrls.size}`);
+    console.log(`- Số hình ảnh trùng lặp trong phân trang: ${duplicateImagesInPagination}`);
+    
+    return {
+      totalProducts,
+      totalPages,
+      uniqueProducts: allProductIds.size,
+      uniqueImages: allImageUrls.size,
+      duplicateImagesInPagination
+    };
+    
+  } catch (error) {
+    console.error("❌ Lỗi khi kiểm tra phân trang:", error);
+    throw error;
+  }
 }
