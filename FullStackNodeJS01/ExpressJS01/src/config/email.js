@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 // Check if email configuration is available
 const isEmailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
 
-const transporter = isEmailConfigured ? nodemailer.createTransporter({
+const transporter = isEmailConfigured ? nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,

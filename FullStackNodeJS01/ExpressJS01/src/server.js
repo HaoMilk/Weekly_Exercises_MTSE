@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import apiRoutes from "./routes/auth.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
+import productRoutes from "./routes/product.routes.js"
 import path from "path";
 
 dotenv.config();
@@ -16,6 +18,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(process.cwd(), "src", "views"));
 
 app.use("/api", apiRoutes);
-
+app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
